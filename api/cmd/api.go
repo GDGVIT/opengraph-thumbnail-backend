@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/GDGVIT/opengraph-thumbnail-backend/api/pkg/api"
-	"github.com/GDGVIT/opengraph-thumbnail-backend/api/pkg/services/usersvc"
+	"github.com/GDGVIT/opengraph-thumbnail-backend/api/pkg/services/opengraphsvc"
 	"github.com/GDGVIT/opengraph-thumbnail-backend/pkg/logger"
 	messagebroker "github.com/GDGVIT/opengraph-thumbnail-backend/pkg/message_broker"
 	"github.com/pkg/errors"
@@ -42,8 +42,8 @@ func RootCmd() *cobra.Command {
 
 			// gormDB, _ := database.Connection()
 			// deps.GormDB = gormDB
-			userSvc := usersvc.Handler(deps.GormDB, deps.Logger, rabbitMq)
-			deps.Services.UserSvc = userSvc
+			openGraphSvc := opengraphsvc.Handler(deps.Logger)
+			deps.Services.OpenGraphSvc = openGraphSvc
 
 			service, serviceErr := api.NewService(ctx, opts, deps)
 			if serviceErr != nil {

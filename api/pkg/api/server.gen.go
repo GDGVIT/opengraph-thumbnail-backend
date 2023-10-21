@@ -4,29 +4,33 @@
 package api
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/labstack/echo/v4"
-	openapi_types "github.com/oapi-codegen/runtime/types"
+	"github.com/oapi-codegen/runtime"
 )
 
-// SignupRequest defines model for SignupRequest.
-type SignupRequest struct {
-	Email    *openapi_types.Email `json:"email,omitempty"`
-	Password *string              `json:"password,omitempty"`
-}
+// OpenGraphParams defines parameters for OpenGraph.
+type OpenGraphParams struct {
+	// Url The URL for which you want to retrieve OpenGraph data.
+	Url string `form:"url" json:"url"`
 
-// SignupResponse defines model for SignupResponse.
-type SignupResponse struct {
-	Message *string `json:"message,omitempty"`
-}
+	// Title Optional custom title to use for OpenGraph data.
+	Title *string `form:"title,omitempty" json:"title,omitempty"`
 
-// SignupJSONRequestBody defines body for Signup for application/json ContentType.
-type SignupJSONRequestBody = SignupRequest
+	// Description Optional custom description to use for OpenGraph data.
+	Description *string `form:"description,omitempty" json:"description,omitempty"`
+
+	// Image Optional custom image to use for OpenGraph data.
+	Image *string `form:"image,omitempty" json:"image,omitempty"`
+}
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// User Signup
-	// (POST /user/signup)
-	Signup(ctx echo.Context) error
+	// OpenGraph Data
+	// (GET /opengraph)
+	OpenGraph(ctx echo.Context, params OpenGraphParams) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -34,12 +38,42 @@ type ServerInterfaceWrapper struct {
 	Handler ServerInterface
 }
 
-// Signup converts echo context to params.
-func (w *ServerInterfaceWrapper) Signup(ctx echo.Context) error {
+// OpenGraph converts echo context to params.
+func (w *ServerInterfaceWrapper) OpenGraph(ctx echo.Context) error {
 	var err error
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params OpenGraphParams
+	// ------------- Required query parameter "url" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "url", ctx.QueryParams(), &params.Url)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter url: %s", err))
+	}
+
+	// ------------- Optional query parameter "title" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "title", ctx.QueryParams(), &params.Title)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter title: %s", err))
+	}
+
+	// ------------- Optional query parameter "description" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "description", ctx.QueryParams(), &params.Description)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter description: %s", err))
+	}
+
+	// ------------- Optional query parameter "image" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "image", ctx.QueryParams(), &params.Image)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter image: %s", err))
+	}
+
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.Signup(ctx)
+	err = w.Handler.OpenGraph(ctx, params)
 	return err
 }
 
@@ -71,6 +105,6 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
-	router.POST(baseURL+"/user/signup", wrapper.Signup)
+	router.GET(baseURL+"/opengraph", wrapper.OpenGraph)
 
 }

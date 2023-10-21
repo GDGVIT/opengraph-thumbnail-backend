@@ -1,11 +1,9 @@
 openapi: 3.0.3
 info:
-  title: Echo Rest API
-  description: A sample REST API
-  termsOfService: https://example.com/terms-of-service
+  title: OpenGraph API
+  description: to add
   license:
-    name: TODO
-    url: TODO
+    name: Anuj Parihar
   version: 1.0.0
   contact:
     name: Anuj Parihar
@@ -15,48 +13,57 @@ servers:
   - url: http://localhost:8080
     description: Local development server
 paths:
-  '/user/signup':
-    post:
-      summary: User Signup
-      operationId: Signup
-      description: Use this endpoint to sign up a user.
-      requestBody:
-        description: User Signup Request
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SignupRequest'
+  '/opengraph':
+    get:  # You can use GET for query parameters
+      summary: OpenGraph Data
+      operationId: OpenGraph
+      description: Use this endpoint to retrieve OpenGraph data for a URL.
+      parameters:
+        - in: query
+          name: url
+          required: true
+          schema:
+            type: string
+            format: url
+          description: The URL for which you want to retrieve OpenGraph data.
+        - in: query
+          name: title
+          required: false
+          schema:
+            type: string
+          description: Optional custom title to use for OpenGraph data.
+        - in: query
+          name: description
+          required: false
+          schema:
+            type: string
+          description: Optional custom description to use for OpenGraph data.
+        - in: query
+          name: image
+          required: false
+          schema:
+            type: string
+            format: url
+          description: Optional custom image to use for OpenGraph data.
       responses:
         '200':
-          description: Signup response
+          description: OpenGraph response
           content:
-            application/json:
+            text/html:
               schema:
-                $ref: '#/components/schemas/SignupResponse'
-              examples:
-                success:
-                  summary: Successful Signup Response
-                  value:
-                    message: User signed up successfully.
-                error:
-                  summary: Error Signup Response
-                  value:
-                    message: Signup failed. Please check your input.
-components:
-  schemas:
-    SignupRequest:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-          example: user@example.com
-        password:
-          type: string
-          example: password123
-    SignupResponse:
-      type: object
-      properties:
-        message:
-          type: string
+                type: string
+                example: |
+                  <!DOCTYPE html>
+                  <html>
+                    <head>
+                      <meta property="og:title" content="OpenGraph API" />
+                      <meta property="og:description" content="to add" />
+                      <meta property="og:image" content="https://avatars.githubusercontent.com/u/1024025?s=400&v=4" />
+                      <meta property="og:url" content="https://github.com/BearTS" />
+                    </head>
+                    <body>
+                    </body>
+                  </html>
+
+  
+

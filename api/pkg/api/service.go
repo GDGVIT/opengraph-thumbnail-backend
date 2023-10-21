@@ -60,7 +60,7 @@ type Options struct {
 }
 
 type Services struct {
-	UserSvc UserService
+	OpenGraphSvc OpenGraphService
 }
 
 // GetFlagSet returns flag set for Options
