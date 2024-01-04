@@ -1,0 +1,11 @@
+version: '3'
+
+tasks:
+  build:
+    cmds:
+      - go build .
+
+  gen:
+    dir: ./api/pkg/routes/
+    cmds:
+      - go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen --config=oapi-codegen.yaml ./openapi-spec.yaml

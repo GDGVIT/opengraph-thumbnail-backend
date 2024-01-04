@@ -1,0 +1,69 @@
+openapi: 3.0.3
+info:
+  title: OpenGraph API
+  description: to add
+  license:
+    name: Anuj Parihar
+  version: 1.0.0
+  contact:
+    name: Anuj Parihar
+    url: https://github.com/BearTS
+    email: anujparihar@yahoo.com
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+paths:
+  '/opengraph':
+    get:  # You can use GET for query parameters
+      summary: OpenGraph Data
+      operationId: OpenGraph
+      description: Use this endpoint to retrieve OpenGraph data for a URL.
+      parameters:
+        - in: query
+          name: url
+          required: true
+          schema:
+            type: string
+            format: url
+          description: The URL for which you want to retrieve OpenGraph data.
+        - in: query
+          name: title
+          required: false
+          schema:
+            type: string
+          description: Optional custom title to use for OpenGraph data.
+        - in: query
+          name: description
+          required: false
+          schema:
+            type: string
+          description: Optional custom description to use for OpenGraph data.
+        - in: query
+          name: image
+          required: false
+          schema:
+            type: string
+            format: url
+          description: Optional custom image to use for OpenGraph data.
+      responses:
+        '200':
+          description: OpenGraph response
+          content:
+            text/html:
+              schema:
+                type: string
+                example: |
+                  <!DOCTYPE html>
+                  <html>
+                    <head>
+                      <meta property="og:title" content="OpenGraph API" />
+                      <meta property="og:description" content="to add" />
+                      <meta property="og:image" content="https://avatars.githubusercontent.com/u/1024025?s=400&v=4" />
+                      <meta property="og:url" content="https://github.com/BearTS" />
+                    </head>
+                    <body>
+                    </body>
+                  </html>
+
+  
+
