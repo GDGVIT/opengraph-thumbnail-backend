@@ -1,5 +1,5 @@
 # oapi-codegen config
-package: api
+package: routes
 generate:
   models: true
   echo-server: true

@@ -9,22 +9,21 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/GDGVIT/opengraph-thumbnail-backend/api/pkg/api"
+	"github.com/GDGVIT/opengraph-thumbnail-backend/api/pkg/handlers"
 	"github.com/GDGVIT/opengraph-thumbnail-backend/api/pkg/services/opengraphsvc"
 	"github.com/GDGVIT/opengraph-thumbnail-backend/pkg/logger"
-	messagebroker "github.com/GDGVIT/opengraph-thumbnail-backend/pkg/message_broker"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 )
 
 func RootCmd() *cobra.Command {
-	opts := &api.Options{
+	opts := &handlers.Options{
 		Path:                "/v1",
 		Port:                3000,
 		ShutdownGracePeriod: 5 * time.Second,
 	}
-	deps := &api.Dependencies{
+	deps := &handlers.Dependencies{
 		Logger: logger.GetInstance(),
 	}
 
@@ -33,19 +32,12 @@ func RootCmd() *cobra.Command {
 		Short: "serves the tenant REST API",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, cancel := context.WithCancel(context.Background())
-
-			rabbitMq, err := messagebroker.NewRabbitMQHelper(os.Getenv("RABBITMQ_HOST_PORT"), 1, deps.Logger)
-			if err != nil {
-				logger.Error(errors.Wrap(err, "failed to initialize RabbitMQ"))
-			}
-			defer rabbitMq.Close()
-
 			// gormDB, _ := database.Connection()
 			// deps.GormDB = gormDB
 			openGraphSvc := opengraphsvc.Handler(deps.Logger)
 			deps.Services.OpenGraphSvc = openGraphSvc
 
-			service, serviceErr := api.NewService(ctx, opts, deps)
+			service, serviceErr := handlers.NewService(ctx, opts, deps)
 			if serviceErr != nil {
 				return Cancel(serviceErr, cancel, service)
 			}

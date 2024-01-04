@@ -1,25 +1,21 @@
-package api
+package handlers
 
 import (
 	"context"
 	_ "embed"
 	"fmt"
-	"net/http"
 	"time"
 
+	"github.com/GDGVIT/opengraph-thumbnail-backend/api/pkg/routes"
 	"github.com/GDGVIT/opengraph-thumbnail-backend/pkg/logger"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/pflag"
-	"gopkg.in/yaml.v3"
 	"gorm.io/gorm"
 )
 
 type EchoContext interface {
 	echo.Context
 }
-
-//go:embed openapi-spec.yaml
-var openAPISpec string
 
 type EchoServer interface {
 	Start(string) error
@@ -31,7 +27,6 @@ type Service struct {
 	opts   *Options
 	logger logger.Logger
 	server EchoServer
-	spec   map[string]interface{}
 
 	Services Services
 }
@@ -79,12 +74,10 @@ func NewService(ctx context.Context, opts *Options, deps *Dependencies) (*Servic
 		opts:     opts,
 		logger:   deps.Logger,
 		server:   deps.EchoServer,
-		spec:     make(map[string]interface{}),
 		Services: deps.Services,
 	}
 	svc.server = svc.createServer()
-	err := yaml.Unmarshal([]byte(openAPISpec), svc.spec)
-	return svc, err
+	return svc, nil
 }
 
 // Start starts the API
@@ -107,14 +100,8 @@ func (svc *Service) Close() (err error) {
 func (svc *Service) createServer() EchoServer {
 	server := echo.New()
 	server.JSONSerializer = &jsonSerializer{}
-	server.GET(svc.opts.Path+"/openapi-spec.json", svc.GetOpenAPISpec)
 	// server.Use(svc.AuthzMiddleware)
 	apiGroup := server.Group("")
-	RegisterHandlersWithBaseURL(apiGroup, svc, svc.opts.Path)
+	routes.RegisterHandlersWithBaseURL(apiGroup, svc, svc.opts.Path)
 	return server
-}
-
-// GetOpenAPISpec - (GET /openapi-spec.json)
-func (svc *Service) GetOpenAPISpec(c echo.Context) error {
-	return c.JSONPretty(http.StatusOK, svc.spec, "  ")
 }

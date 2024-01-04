@@ -5,7 +5,6 @@ import (
 	"os"
 
 	api "github.com/GDGVIT/opengraph-thumbnail-backend/api/cmd"
-	mailer "github.com/GDGVIT/opengraph-thumbnail-backend/mailer/cmd"
 
 	"github.com/spf13/cobra"
 )
@@ -20,7 +19,6 @@ var cmd = &cobra.Command{
 
 // Execute - starts the CLI
 func init() {
-	cmd.AddCommand(mailer.RootCmd)
 	cmd.AddCommand(api.RootCmd())
 }
 

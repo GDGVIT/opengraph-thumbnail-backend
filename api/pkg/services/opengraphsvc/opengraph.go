@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/GDGVIT/opengraph-thumbnail-backend/api/pkg/api"
+	"github.com/GDGVIT/opengraph-thumbnail-backend/api/pkg/routes"
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (svc *OpenGraphSvcImpl) OpenGraphEditor(c context.Context, params api.OpenGraphParams) (string, error) {
+func (svc *OpenGraphSvcImpl) OpenGraphEditor(c context.Context, params routes.OpenGraphParams) (string, error) {
 	// Get the metadata
 	metaData, err := getMetadata(params.Url, params.Title, params.Description, params.Image)
 	if err != nil {
