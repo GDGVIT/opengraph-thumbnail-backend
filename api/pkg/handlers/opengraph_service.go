@@ -10,6 +10,7 @@ import (
 
 type OpenGraphService interface {
 	OpenGraphEditor(ctx context.Context, params routes.OpenGraphParams) (string, error)
+	GetMetadata(ctx context.Context, params routes.GetMetadataParams) (routes.Metadata, error)
 }
 
 // OpenGraph - Data
@@ -23,4 +24,15 @@ func (svc *Service) OpenGraph(c echo.Context, params routes.OpenGraphParams) err
 	}
 
 	return c.HTML(http.StatusOK, html)
+}
+
+func (svc *Service) GetMetadata(c echo.Context, params routes.GetMetadataParams) error {
+
+	metadata, err := svc.Services.OpenGraphSvc.GetMetadata(c.Request().Context(), params)
+	if err != nil {
+		svc.logger.Error("Failed to get OpenGraph data:", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to get OpenGraph data")
+	}
+
+	return c.JSON(http.StatusOK, metadata)
 }

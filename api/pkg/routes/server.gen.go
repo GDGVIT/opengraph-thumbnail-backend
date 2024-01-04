@@ -11,6 +11,20 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
+// Metadata defines model for Metadata.
+type Metadata struct {
+	Description string `json:"description"`
+	Image       string `json:"image"`
+	Title       string `json:"title"`
+	Url         string `json:"url"`
+}
+
+// GetMetadataParams defines parameters for GetMetadata.
+type GetMetadataParams struct {
+	// Url The URL for which you want to retrieve OpenGraph data.
+	Url string `form:"url" json:"url"`
+}
+
 // OpenGraphParams defines parameters for OpenGraph.
 type OpenGraphParams struct {
 	// Url The URL for which you want to retrieve OpenGraph data.
@@ -28,6 +42,9 @@ type OpenGraphParams struct {
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Get metadata of a URL
+	// (GET /metadata)
+	GetMetadata(ctx echo.Context, params GetMetadataParams) error
 	// OpenGraph Data
 	// (GET /opengraph)
 	OpenGraph(ctx echo.Context, params OpenGraphParams) error
@@ -36,6 +53,24 @@ type ServerInterface interface {
 // ServerInterfaceWrapper converts echo contexts to parameters.
 type ServerInterfaceWrapper struct {
 	Handler ServerInterface
+}
+
+// GetMetadata converts echo context to params.
+func (w *ServerInterfaceWrapper) GetMetadata(ctx echo.Context) error {
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetMetadataParams
+	// ------------- Required query parameter "url" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "url", ctx.QueryParams(), &params.Url)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter url: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetMetadata(ctx, params)
+	return err
 }
 
 // OpenGraph converts echo context to params.
@@ -105,6 +140,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
+	router.GET(baseURL+"/metadata", wrapper.GetMetadata)
 	router.GET(baseURL+"/opengraph", wrapper.OpenGraph)
 
 }

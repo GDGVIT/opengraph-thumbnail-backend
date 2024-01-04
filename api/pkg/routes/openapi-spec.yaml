@@ -65,5 +65,41 @@ paths:
                     </body>
                   </html>
 
-  
+  '/metadata':
+   get:  # You can use GET for query parameters
+      summary: Get metadata of a URL
+      operationId: GetMetadata
+      parameters:
+        - in: query
+          name: url
+          required: true
+          schema:
+            type: string
+            format: url
+          description: The URL for which you want to retrieve OpenGraph data.
+      responses:
+        '200':
+          description: Get Metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
 
+components:
+  schemas:
+    Metadata:
+      type: object
+      required:
+        - title
+        - description
+        - image
+        - url
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+        url:
+          type: string
