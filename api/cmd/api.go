@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"reflect"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -18,9 +19,12 @@ import (
 )
 
 func RootCmd() *cobra.Command {
+	strport := os.Getenv("PORT")
+	// convert string to int
+	port, _ := strconv.Atoi(strport)
 	opts := &handlers.Options{
 		Path:                "/v1",
-		Port:                3000,
+		Port:                port,
 		ShutdownGracePeriod: 5 * time.Second,
 	}
 	deps := &handlers.Dependencies{
