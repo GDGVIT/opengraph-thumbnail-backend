@@ -18,5 +18,7 @@ ENV TZ=Asia/Kolkata
 WORKDIR /app
 COPY --from=builder /app/main .
 
+EXPOSE 3000
+
 USER nobody:nobody
-ENTRYPOINT ["./main api"]
+CMD [ "./main", "api"]

@@ -21,7 +21,10 @@ import (
 func RootCmd() *cobra.Command {
 	strport := os.Getenv("PORT")
 	// convert string to int
-	port, _ := strconv.Atoi(strport)
+	port, err := strconv.Atoi(strport)
+	if err != nil {
+		port = 3000
+	}
 	opts := &handlers.Options{
 		Path:                "/v1",
 		Port:                port,
