@@ -9,6 +9,7 @@ import (
 	"github.com/GDGVIT/opengraph-thumbnail-backend/api/pkg/routes"
 	"github.com/GDGVIT/opengraph-thumbnail-backend/pkg/logger"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/spf13/pflag"
 	"gorm.io/gorm"
 )
@@ -99,6 +100,7 @@ func (svc *Service) Close() (err error) {
 
 func (svc *Service) createServer() EchoServer {
 	server := echo.New()
+	server.Use(middleware.CORS())
 	server.JSONSerializer = &jsonSerializer{}
 	// server.Use(svc.AuthzMiddleware)
 	apiGroup := server.Group("")
