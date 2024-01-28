@@ -2,7 +2,6 @@ package opengraphsvc
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"strings"
 
@@ -13,17 +12,17 @@ import (
 func (svc *OpenGraphSvcImpl) GetMetadata(ctx context.Context, params routes.GetMetadataParams) (routes.Metadata, error) {
 	res, err := http.Get(params.Url)
 	if err != nil {
-		log.Fatal(err)
+		svc.logger.Debugf("error in get request", err)
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+		svc.logger.Debugf("status code error: %d %s", res.StatusCode, res.Status)
 	}
 
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
-		log.Fatal(err)
+		svc.logger.Debugf("error in goquery", err)
 	}
 
 	metaData := make(map[string]string)

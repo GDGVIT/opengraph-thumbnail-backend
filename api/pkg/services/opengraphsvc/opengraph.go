@@ -3,7 +3,6 @@ package opengraphsvc
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
@@ -15,7 +14,8 @@ func (svc *OpenGraphSvcImpl) OpenGraphEditor(c context.Context, params routes.Op
 	// Get the metadata
 	metaData, err := getMetadata(params.Url, params.Title, params.Description, params.Image)
 	if err != nil {
-		log.Fatal(err)
+		svc.logger.Debugf("error in get request", err)
+		return "", err
 	}
 
 	// Generate a temporary HTML page with the metadata
@@ -28,17 +28,17 @@ func (svc *OpenGraphSvcImpl) OpenGraphEditor(c context.Context, params routes.Op
 func getMetadata(url string, customTitle *string, customDescription *string, customImage *string) (map[string]string, error) {
 	res, err := http.Get(url)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+		return nil, fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
 	}
 
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	metaData := make(map[string]string)
